@@ -1,0 +1,94 @@
+body {
+  font-size: 120%;
+  font-family: Arial;
+}
+
+tr {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  justify-content: space-between;
+}
+
+.buttons {
+  white-space: nowrap;
+}
+
+button, input {
+  font-size: 100%;
+  font-family: Arial;
+
+}
+
+td:nth-child(2), th:nth-child(2) {
+  float: right;
+}
+
+
+tr > td ~ i {
+  font-size: initial;
+  /* color: hsl(0, 65%, 47%); */
+  color: grey;
+  float: right;
+  margin-right: 15px;
+  cursor: pointer;
+  padding: 0.25em;
+}
+
+tr > td ~ i:hover, tr > td ~ i:active {
+  color: black;
+  /* color: hsl(0, 91%, 54%); */
+  background-color: white;
+  border-radius: 50%;
+}
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td, th {
+  flex-basis: 100%;
+  border: none;
+  text-align: left;
+  padding: 8px;
+  height: 1rem;
+}
+
+tr:nth-child(even) {
+  background-color: #ddd;
+}
+
+
+tr:nth-child(odd) {
+  background-color: #eee;
+}
+
+.error {
+  color: red;
+}
+
+.wrapper {
+  margin: 0 auto;
+  max-width: 825px;
+  text-align: center;
+}
+
+.total {
+  font-size: 150%;
+  text-decoration: underline;
+}
+
+.form {
+  margin-top: 25px;
+  width: 100%;
+}
+
+.transactions {
+  text-align: left;
+  max-height: 300px;
+  overflow: auto;
+  width: 90%;
+  margin: 0 auto;
+}
