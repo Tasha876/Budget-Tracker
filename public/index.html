@@ -9,7 +9,7 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
   <link rel="stylesheet" href="styles.css">
-
+  <link rel="manifest" href="manifest.webmanifest" />
   <title>Budget Tracker</title>
 </head>
 <body>
@@ -44,6 +44,21 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <script src="./indexedDB.js"></script>
   <script src="index.js"></script>
+  <script src="./service-worker.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('service-worker.js')
+        .then((registration) => {
+          console.log('Service Worker Registered!');
+        })
+        .catch((error) => {
+          console.log('Service Worker Registration Failed!');
+          console.log(error);
+        });
+    }
+  </script>
 </body>
 </html>
