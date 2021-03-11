@@ -1,16 +1,17 @@
 let transactions = [];
 let myChart;
 
+
 // when online add applicable items in indexeddb to the main db and delete what needs to be deleted
 const consolidate = () => {
   let toDelete = []
   let toKeep = []
+  console.log("inside consolidate")
   useOffline("get").then(tx => {
-    console.log("here")
     tx.forEach(transaction => {
       if (transaction.delete) {
         toDelete.push(transaction.date)
-      } else if (!transaction.delete){
+      } else {
         toKeep.push(transaction)
       }
       console.log("look here",tx)
@@ -18,9 +19,9 @@ const consolidate = () => {
 
     console.log("to keep", toKeep)
 
-    transaction = transactions.filter(transaction => {
-      return !toDelete.includes(transaction.date)
-    })
+    // transaction = transactions.filter(transaction => {
+    //   return !toDelete.includes(transaction.date)
+    // })
 
     toKeep.reverse()
 
@@ -36,27 +37,29 @@ const consolidate = () => {
       del(transactionDate)
     })
 
-    transactions = toKeep.concat(transactions)
+    // transactions = toKeep.concat(transactions)
 
     useOffline("clear")
   })
-  // populateChart();
-  // populateTable();
-  // populateTotal();
+  // return toKeep;
 }
+
+// window.ononline = () => {
+//   // console.log("ononline")
+//   consolidate()
+// }
 
 fetch("/api/transaction")
   .then(response => {
     return response.json();
   })
   .then(data => {
-    // save db data on global variable
+
     transactions = data;
 
-    console.log(navigator.onLine)
-    consolidate()
+    // consolidate()
 
-    console.log(transactions)
+    // console.log(transactions)
     populateTotal();
     populateTable();
     populateChart();
@@ -76,7 +79,6 @@ const post = (transaction) => {
   .then(response => {    
     return console.log(response.json());
   })
-  // .then(data => resolve(data))
 }
 
 // this function deletes from the server
@@ -88,13 +90,6 @@ const del = (id) => {
     return response.json();
   })
 }
-
-//   console.log('here')
-//   useOffline("get").then(tx => {
-//     transactions.concat(console.log(tx.filter(transaction => !transaction.delete)));
-//   })
-//   useOffline("clear");
-// }
 
 function populateTotal() {
   // reduce transaction amounts to a single total value
@@ -196,9 +191,6 @@ function deleteTransaction(e) {
     .catch(e => {
       useOffline("put", {
         _id: toDelete.date,
-        name: toDelete.name,
-        value: Number(toDelete.value),
-        date: toDelete.date,
         delete: true,
       })
     })
@@ -242,7 +234,7 @@ function sendTransaction(isAdding) {
   
   post(transaction)
   .then(data => {
-    if (data.errors) {
+    if (data && data.errors) {
       errorEl.textContent = "Missing Information";
     }
     else {
@@ -270,12 +262,14 @@ document.querySelector("#sub-btn").onclick = function() {
 
 // store in indexedDB if not online
 const saveRecord = (transaction) => {
-  useOffline("put",{
-    _id: transaction.date,
+  useOffline("add",{
     name: transaction.name,
     value: Number(transaction.value),
     date: transaction.date,
   });
+  //send to service worker
+  // navigator.serviceWorker.controller.postMessage({ transaction: transaction })
+
 };
 
 // useOffline("get").then(tx => {
