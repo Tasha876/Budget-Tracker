@@ -4,14 +4,10 @@ let myChart;
 fetch("/api/transaction")
   .then(response => {
     return response.json()
-    // return response.json();
   })
   .then(data => {
     // save db data on global variable
-    // transactions = data;
     transactions = data;
-    console.log(transactions)
-    // console.log(toKeep, transactions)
     populateTotal();
     populateTable();
     populateChart();
@@ -20,7 +16,6 @@ fetch("/api/transaction")
 
 // this function sends the data to the server
 const post = (transaction) => {
-  // console.log(transaction)
   return fetch("/api/transaction", {
     method: "POST",
     body: JSON.stringify(transaction),
@@ -55,8 +50,6 @@ function populateTotal() {
 function populateTable() {
   let tbody = document.querySelector("#tbody");
   tbody.innerHTML = "";
-
-  console.log(transactions)
 
   transactions.forEach(transaction => {
     // create and populate a table row
@@ -117,7 +110,6 @@ function populateChart() {
 function deleteTransaction(e) {
 
   let deleteEl = e.target.parentElement;
-  console.log(deleteEl)
   
   let index;
 
@@ -128,7 +120,6 @@ function deleteTransaction(e) {
     return transaction.date === id;
   })
 
-  console.log(index);
 
   transactions.splice(index,1)
     // re-run logic to populate ui without old record
@@ -184,7 +175,6 @@ function sendTransaction(isAdding) {
   
   post(transaction)
   .then(data => {
-    console.log(data)
     if (data && data.errors) {
       errorEl.textContent = "Missing Information";
     }
@@ -195,7 +185,6 @@ function sendTransaction(isAdding) {
     }
   })
   .catch(e => {
-    console.log(e)
     // fetch failed, so save in indexed db
     saveRecord(transaction);
     // clear form

@@ -25,7 +25,8 @@ const useOffline = (method, object) => {
             store = tx.objectStore(storeName);
 
           db.onerror = (e) => {
-            console.log("error");
+            console.log(`The following error occured ${e}`)
+            reject(e);
           };
           switch(method) {
               case "add":
@@ -36,11 +37,9 @@ const useOffline = (method, object) => {
                 break
               case "clear":
                 store.clear();
-                // console.log("store",store)
                 break
               case "get":
                 const all = store.getAll();
-                // console.log(store)
                 all.onsuccess = () => {
                   resolve(all.result);
                 };
@@ -65,7 +64,6 @@ self.addEventListener('install', event => {
             ]);
       })
     );
-    console.log('Install');
     self.skipWaiting();
   });
 
@@ -83,7 +81,6 @@ self.addEventListener('install', event => {
       case 'POST':
         event.respondWith(fetch(event.request)
         .then(response => {
-          console.log(response)
         return response
       })
       )
@@ -93,18 +90,20 @@ self.addEventListener('install', event => {
 
 const synchronize = () => {
 
-
+  // adds or deletes data added or deleted while offline from the main db
   useOffline("get")
   .then(txs => {
-      console.log("here")
       txs.forEach(transaction => {
+        // filters for transactions that are in indexedDB
+        // and deletes them
+        // if the id is in indexedDB but not in the original database,
+        // then the transaction is just ignored (i.e. not added  to the main db 
+        // and doesn't need to be deleted from it)
         if (transaction.delete) {
           self.fetch("/api/transaction/" + transaction._id, {
             method: "DELETE",
           })
         } else {
-          // toKeep.push(transaction)
-          console.log("transaction",transaction)
           self.fetch("api/transaction", {
           method: "POST",
           body: JSON.stringify({
@@ -120,8 +119,10 @@ const synchronize = () => {
         }
       })
     })
+    // indexedDB is now cleared
     .then(useOffline("clear"))
 }
 
+// I kept this because it makes the service worker seem friendly :)
 console.log("hello from service worker")
   
