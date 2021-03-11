@@ -3,12 +3,14 @@ let myChart;
 
 
 // when online add applicable items in indexeddb to the main db and delete what needs to be deleted
-const consolidate = () => {
-  let toDelete = []
+const consolidate = (transactions) => {
+
   let toKeep = []
-  console.log("inside consolidate")
-  useOffline("get").then(tx => {
-    tx.forEach(transaction => {
+  let toDelete = []
+
+    useOffline("get").then(tx => {
+    console.log("here")
+    tx.map(transaction => {
       if (transaction.delete) {
         toDelete.push(transaction.date)
       } else {
@@ -17,31 +19,31 @@ const consolidate = () => {
       console.log("look here",tx)
     })
 
-    console.log("to keep", toKeep)
-
-    // transaction = transactions.filter(transaction => {
-    //   return !toDelete.includes(transaction.date)
-    // })
-
-    toKeep.reverse()
-
-    toKeep.forEach(transaction => {
-      post({
-        name: transaction.name,
-        value: transaction.value,
-        date: transaction.date,
-      })
+    console.log("del",toDelete,"keep", toKeep)
+  
+  console.log(toKeep, toDelete)
+  toKeep.forEach(transaction => {
+    post({
+      name: transaction.name,
+      value: transaction.value,
+      date: transaction.date,
     })
+  })
 
-    toDelete.forEach(transactionDate => {
-      del(transactionDate)
-    })
+  toDelete.forEach(transactionDate => {
+    del(transactionDate)
+  })
+
+  transactions = toKeep.concat(transactions)
 
     // transactions = toKeep.concat(transactions)
+  useOffline("clear")
 
-    useOffline("clear")
   })
   // return toKeep;
+  console.log("txs",transactions)
+  return transactions
+
 }
 
 // window.ononline = () => {
@@ -51,15 +53,15 @@ const consolidate = () => {
 
 fetch("/api/transaction")
   .then(response => {
-    return response.json();
+    return consolidate(response.json())
+    // return response.json();
   })
   .then(data => {
-
+    // save db data on global variable
+    // transactions = data;
     transactions = data;
-
-    // consolidate()
-
-    // console.log(transactions)
+    console.log(transactions)
+    // console.log(toKeep, transactions)
     populateTotal();
     populateTable();
     populateChart();
@@ -68,6 +70,7 @@ fetch("/api/transaction")
 
 // this function sends the data to the server
 const post = (transaction) => {
+  // console.log(transaction)
   return fetch("/api/transaction", {
     method: "POST",
     body: JSON.stringify(transaction),
@@ -76,9 +79,8 @@ const post = (transaction) => {
       "Content-Type": "application/json"
     }
   })
-  .then(response => {    
-    return console.log(response.json());
-  })
+  .then(response => console.log(response.json()));
+
 }
 
 // this function deletes from the server
@@ -86,9 +88,7 @@ const del = (id) => {
   return fetch("/api/transaction/" + id, {
     method: "DELETE",
   })
-  .then(response => {    
-    return response.json();
-  })
+  .then(response => console.log(response.json()));
 }
 
 function populateTotal() {
@@ -114,7 +114,7 @@ function populateTable() {
     let trash = document.createElement('i');
     trash.classList.add("fas", "fa-trash-alt","delete")
     trash.addEventListener("click",deleteTransaction)
-    console.log(trash)
+
     tr.innerHTML = `
       <td>${transaction.name}</td>
       <td>\$${Number(transaction.value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} </td>
@@ -173,7 +173,7 @@ function deleteTransaction(e) {
 
   let id = deleteEl.getAttribute("data-id");
   // filter according to id if online
-  let toDelete = transactions.find((transaction,i) => {
+  let toDel = transactions.find((transaction,i) => {
     index = i;
     return transaction.date === id;
   })
@@ -234,6 +234,7 @@ function sendTransaction(isAdding) {
   
   post(transaction)
   .then(data => {
+    console.log(data)
     if (data && data.errors) {
       errorEl.textContent = "Missing Information";
     }
@@ -243,7 +244,8 @@ function sendTransaction(isAdding) {
       amountEl.value = "";
     }
   })
-  .catch(err => {
+  .catch(e => {
+    console.log(e)
     // fetch failed, so save in indexed db
     saveRecord(transaction);
     // clear form
