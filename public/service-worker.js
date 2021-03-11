@@ -1,6 +1,7 @@
 const databaseName = "budget-tracker";
 const storeName = "budget";
 
+// makes it easier to access indexedDB methods
 const useOffline = (method, object) => {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(databaseName, 1)
