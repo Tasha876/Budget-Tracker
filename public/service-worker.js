@@ -1,9 +1,3 @@
-// const { request } = require("express");
-
-// const e = require("express");
-
-// const API = require("./routes/api.js")/
-
 const databaseName = "budget-tracker";
 const storeName = "budget";
 
@@ -42,11 +36,11 @@ const useOffline = (method, object) => {
                 break
               case "clear":
                 store.clear();
-                console.log("store",store)
+                // console.log("store",store)
                 break
               case "get":
                 const all = store.getAll();
-                console.log(store)
+                // console.log(store)
                 all.onsuccess = () => {
                   resolve(all.result);
                 };
@@ -74,21 +68,12 @@ self.addEventListener('install', event => {
     console.log('Install');
     self.skipWaiting();
   });
-  
-  // receives mesage once it arrives
-  // self.addEventListener('message', (event) => {
-  //   console.log('form data', event.data)
-  //   if (event.data.hasOwnProperty('form_data')) {
-  //     // receives form data from script.js upon submission
-  //     form_data = event.data.form_data
-  //   }
-  // })
 
   // retrieve assets from cache
   self.addEventListener('fetch', event => {
     switch (event.request.method) {
       case 'GET':
-        sendPostToServer()
+        synchronize()
         event.respondWith(
           caches.match(event.request).then(response => {
             return response || fetch(event.request);
@@ -101,49 +86,41 @@ self.addEventListener('install', event => {
           console.log(response)
         return response
       })
-        // .catch(err => {
-        //   sendPostToServer()
-        //     // only save post requests in browser, if an error occurs
-        //     // idb.savePostRequests(event.request.clone().url, form_data)
-        //   })
       )
     }
     
   });
 
-  // self.addEventListener('sync', (event) => {
-  //   console.log('now online')
-  //   if (event.tag === 'sendFormData') { // event.tag name checked
-  //     // here must be the same as the one used while registering
-  //     // sync
-  //     event.waitUntil(
-  //       // Send our POST request to the server, now that the user is
-  //       // online
-  //       sendPostToServer()
-  //     )}
-  //     // useOffline("clear")
-  // })
+const synchronize = () => {
 
 
-const sendPostToServer = () => {
   useOffline("get")
-  .then(messages => messages.forEach(message => {
-    console.log("message",message)
-    self.fetch("api/transaction", {
-    method: "POST",
-    body: JSON.stringify({
-        name: message.name,
-        value: message.value,
-        date: message.date,
-        }),
-    headers: {
-      Accept: "application/json, text/plain, */*",
-      "Content-Type": "application/json"
-    }
-  })
-  }))
-  .then(useOffline("clear")
-  )
+  .then(txs => {
+      console.log("here")
+      txs.forEach(transaction => {
+        if (transaction.delete) {
+          self.fetch("/api/transaction/" + transaction._id, {
+            method: "DELETE",
+          })
+        } else {
+          // toKeep.push(transaction)
+          console.log("transaction",transaction)
+          self.fetch("api/transaction", {
+          method: "POST",
+          body: JSON.stringify({
+              name: transaction.name,
+              value: transaction.value,
+              date: transaction.date,
+              }),
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json"
+          }
+          })
+        }
+      })
+    })
+    .then(useOffline("clear"))
 }
 
 console.log("hello from service worker")

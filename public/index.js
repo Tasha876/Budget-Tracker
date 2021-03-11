@@ -1,59 +1,9 @@
 let transactions = [];
 let myChart;
 
-
-// when online add applicable items in indexeddb to the main db and delete what needs to be deleted
-const consolidate = (transactions) => {
-
-  let toKeep = []
-  let toDelete = []
-
-    useOffline("get").then(tx => {
-    console.log("here")
-    tx.map(transaction => {
-      if (transaction.delete) {
-        toDelete.push(transaction.date)
-      } else {
-        toKeep.push(transaction)
-      }
-      console.log("look here",tx)
-    })
-
-    console.log("del",toDelete,"keep", toKeep)
-  
-  console.log(toKeep, toDelete)
-  toKeep.forEach(transaction => {
-    post({
-      name: transaction.name,
-      value: transaction.value,
-      date: transaction.date,
-    })
-  })
-
-  toDelete.forEach(transactionDate => {
-    del(transactionDate)
-  })
-
-  transactions = toKeep.concat(transactions)
-
-    // transactions = toKeep.concat(transactions)
-  useOffline("clear")
-
-  })
-  // return toKeep;
-  console.log("txs",transactions)
-  return transactions
-
-}
-
-// window.ononline = () => {
-//   // console.log("ononline")
-//   consolidate()
-// }
-
 fetch("/api/transaction")
   .then(response => {
-    return consolidate(response.json())
+    return response.json()
     // return response.json();
   })
   .then(data => {
@@ -189,8 +139,8 @@ function deleteTransaction(e) {
     // also delete from server
     del(id)
     .catch(e => {
-      useOffline("put", {
-        _id: toDelete.date,
+      useOffline("add", {
+        _id: toDel.date,
         delete: true,
       })
     })
@@ -269,17 +219,5 @@ const saveRecord = (transaction) => {
     value: Number(transaction.value),
     date: transaction.date,
   });
-  //send to service worker
-  // navigator.serviceWorker.controller.postMessage({ transaction: transaction })
-
 };
 
-// useOffline("get").then(tx => {
-//   tx.forEach(transaction => {
-//     transactions.push(transaction)
-//     console.log(transaction)
-//   });
-  // populateTotal();
-  // populateTable();
-  // populateChart();
-// });
