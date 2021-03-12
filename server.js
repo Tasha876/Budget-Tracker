@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 mongoose.connect(
-  process.env.MONGODB_URI || "mongodb+srv://nfray:JpNkUoBRVhuCEKue@cluster0.jhsyl.mongodb.net/budget-tracker?retryWrites=true&w=majority",
+  process.env.MONGODB_URI || "mongodb://localhost/budget",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
