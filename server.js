@@ -15,10 +15,10 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-const uri = "mongodb+srv://nfray:JpNkUoBRVhuCEKue@cluster0.jhsyl.mongodb.net/budget-tracker?retryWrites=true&w=majority";
+// const uri = "mongodb+srv://nfray:JpNkUoBRVhuCEKue@cluster0.jhsyl.mongodb.net/budget-tracker?retryWrites=true&w=majority";
 
 mongoose.connect(
-    process.env.MONGODB_URI || uri,
+    process.env.MONGODB_URI,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
