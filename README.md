@@ -28,7 +28,7 @@ Screenshot of the webpage.
 
 <a name="deployed"></a>
 ## 3. Deployed Webpage
-[The deployed site](https://tasha876.github.io/Work-Day-Scheduler/index.html), hosted by Heroku.
+[The deployed site](https://hidden-lowlands-97124.herokuapp.com/), hosted by Heroku.
 
 <a name="support"></a>
 ## 4. Support
