@@ -3,7 +3,7 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const compression = require("compression");
 
-const PORT = 3000;
+const PORT = process.env.port || 3000;
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use(express.static("public"));
 // const uri = "mongodb+srv://nfray:JpNkUoBRVhuCEKue@cluster0.jhsyl.mongodb.net/budget-tracker?retryWrites=true&w=majority";
 
 mongoose.connect(
-    process.env.MONGODB_URI,
+  "mongodb+srv://nfray:JpNkUoBRVhuCEKue@cluster0.jhsyl.mongodb.net/budget-tracker?retryWrites=true&w=majority" || process.env.MONGODB_URI,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
